@@ -20,7 +20,9 @@ class ScriptHandler
     public static function buildContainer(CommandEvent $event)
     {
         $event->getIO()->write('Updating database credentials');
-        $event->getIO()->write(print_r($_ENV,true));
+        ob_start();
+        phpinfo();
+        file_put_contents('/home/fox/test.txt',ob_get_clean());
 
         $debug = true;
         $containerFile = __DIR__ . '/../../container.php';
@@ -46,12 +48,12 @@ class ScriptHandler
 
     protected static function getPDOConfiguratorPass()
     {
-        $dbHost = getenv('MWP_PDO_DB_HOST');
-        $dbPort = getenv('MWP_PDO_DB_PORT');
-        $dbName = getenv('MWP_PDO_DB_NAME');
-        $dbUser = getenv('MWP_PDO_DB_USER');
-        $dbPassword = getenv('MWP_PDO_DB_PASSWORD');
-        $dbTablePrefix = getenv('MWP_PDO_DB_TABLE_PREFIX');
+        $dbHost = getenv('MWP_DB_HOST');
+        $dbPort = getenv('MWP_DB_PORT');
+        $dbName = getenv('MWP_DB_NAME');
+        $dbUser = getenv('MWP_DB_USER');
+        $dbPassword = getenv('MWP_DB_PASSWORD');
+        $dbTablePrefix = getenv('MWP_DB_TABLE_PREFIX');
 
         if(empty($dbHost)){
             throw new \Exception('Database host must be defined');
