@@ -10,7 +10,12 @@
             "MWP": "src/"
         }
     },
-    "post-autoload-dump": [
-        "MWP\\ScriptHandler::buildContainer"
-    ]
+    "scripts": {
+        "post-install-cmd": [
+            "MWP\\ScriptHandler::buildContainer"
+        ],
+        "post-update-cmd": [
+            "MWP\\ScriptHandler::buildContainer"
+        ]
+    }
 }

@@ -12,12 +12,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use MWP\Compiler\SetPDOConfigurationPass;
+use Composer\Script\CommandEvent;
 
 class ScriptHandler
 {
 
-    public static function buildContainer()
+    public static function buildContainer(CommandEvent $event)
     {
+        $event->getIO()->write('Updating database credentials...');
+
         $debug = true;
         $containerFile = __DIR__ . '/../../container.php';
         $containerConfigCache = new ConfigCache($containerFile, $debug);
@@ -48,6 +51,23 @@ class ScriptHandler
         $dbUser = getenv('MWP_PDO_DB_USER');
         $dbPassword = getenv('MWP_PDO_DB_PASSWORD');
         $dbTablePrefix = getenv('MWP_PDO_DB_TABLE_PREFIX');
+
+        if(empty($dbHost)){
+            throw new \Exception('Database host must be defined');
+        }
+        if(empty($dbPort)) {
+            throw new \Exception('Database port must be defined');
+        }
+        if(empty($dbName)) {
+            throw new \Exception('Database name must be defined');
+        }
+        if(empty($dbUser)) {
+            throw new \Exception('Database user must be defined');
+        }
+        if(empty($dbPassword)) {
+            throw new \Exception('Database password must be defined');
+        }
+
 
         $pdoConfigurator = new SetPDOConfigurationPass($dbName, $dbUser, $dbPassword, $dbHost, $dbPort, $dbTablePrefix);
         return $pdoConfigurator;
