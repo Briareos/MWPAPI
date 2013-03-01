@@ -9,5 +9,8 @@
         "psr-0": {
             "MWP": "src/"
         }
-    }
+    },
+    "post-autoload-dump": [
+        "MWP\\ScriptHandler::buildContainer"
+    ]
 }
