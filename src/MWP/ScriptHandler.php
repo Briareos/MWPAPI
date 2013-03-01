@@ -19,7 +19,8 @@ class ScriptHandler
 
     public static function buildContainer(CommandEvent $event)
     {
-        $event->getIO()->write('Updating database credentials...');
+        $event->getIO()->write('Updating database credentials');
+        $event->getIO()->write(print_r($_ENV,true));
 
         $debug = true;
         $containerFile = __DIR__ . '/../../container.php';
