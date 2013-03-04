@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="pdo" class="PDO">
+            <argument>mysql:host=%db_host%;dbname=%db_name%</argument>
+            <argument>%db_user%</argument>
+            <argument>%db_password%</argument>
+            <argument type="collection">
+                <!-- PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION -->
+                <argument index="3">2</argument>
+                <!-- PDO::MYSQL_ATTR_INIT_COMMAND -->
+                <argument index="1002">SET NAMES utf8</argument>
+            </argument>
+        </service>
+        <service id="repository_manager" class="MWP\Repository\RepositoryManager">
+            <call method="addRepository">
+                <argument>User</argument>
+                <argument type="service" id="user_repository"/>
+            </call>
+            <call method="addRepository">
+                <argument>Site</argument>
+                <argument type="service" id="site_repository"/>
+            </call>
+            <call method="addRepository">
+                <argument>Group</argument>
+                <argument type="service" id="group_repository"/>
+            </call>
+        </service>
+        <service id="query_builder" class="Doctrine\DBAL\Query\QueryBuilder">
+            <argument type="service" id="connection"/>
+        </service>
+        <service id="driver.pdo_mysql" class="Doctrine\DBAL\Driver\PDOMySql\Driver">
+        </service>
+        <service id="connection" class="Doctrine\DBAL\Connection">
+            <argument type="collection">
+                <argument key="pdo" type="service" id="pdo"/>
+            </argument>
+            <argument type="service" id="driver.pdo_mysql"/>
+        </service>
+        <service id="user_repository" class="MWP\Repository\UserRepository">
+            <argument type="service" id="connection"/>
+            <tag name="mwp.repository"/>
+        </service>
+        <service id="site_repository" class="MWP\Repository\SiteRepository">
+            <argument type="service" id="connection"/>
+            <tag name="mwp.repository"/>
+        </service>
+        <service id="favorite_repository" class="MWP\Repository\FavoriteRepository">
+            <argument type="service" id="connection"/>
+            <tag name="mwp.repository"/>
+        </service>
+
+        <service id="group_repository" class="MWP\Repository\GroupRepository">
+            <argument type="service" id="connection"/>
+            <tag name="mwp.repository"/>
+        </service>
+        <service id="api" class="MWP\API">
+            <argument type="service" id="repository_manager"/>
+        </service>
+    </services>
+</container>
