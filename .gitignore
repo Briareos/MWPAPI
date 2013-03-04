@@ -2,3 +2,4 @@ vendor
 composer.phar
 container.php
 container.php.meta
+config/config.php
