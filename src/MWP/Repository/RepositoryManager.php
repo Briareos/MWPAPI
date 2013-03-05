@@ -9,17 +9,8 @@ class RepositoryManager
      */
     protected $repositories;
 
-    protected $prefix;
-
-    function __construct($prefix = '')
-    {
-        $this->prefix = $prefix;
-    }
-
-
     public function registerRepository($name, BaseRepository $repository)
     {
-        $repository->setPrefix($this->prefix);
         $this->repositories[$name] = $repository;
     }
 

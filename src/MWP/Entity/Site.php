@@ -187,10 +187,8 @@ class Site
 
     public function __construct()
     {
-        if($this->group_ids !== null) {
+        if ($this->group_ids !== null) {
             $this->group_ids = explode(',', $this->group_ids);
-        } else {
-            $this->group_ids = array();
         }
     }
 
@@ -741,6 +739,14 @@ class Site
     public function getWpUsername()
     {
         return $this->wp_username;
+    }
+
+    /**
+     * @param array $group_ids
+     */
+    public function setGroupIds(array $group_ids)
+    {
+        $this->group_ids = $group_ids;
     }
 
     /**

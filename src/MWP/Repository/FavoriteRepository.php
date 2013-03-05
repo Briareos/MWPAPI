@@ -2,13 +2,11 @@
 
 namespace MWP\Repository;
 
+use PDO;
 use MWP\Entity\Favorite;
 
 class FavoriteRepository extends BaseRepository
 {
-    /**
-     * @return string
-     */
     public function getEntityClass()
     {
         return 'MWP\Entity\Favorite';
@@ -68,12 +66,14 @@ class FavoriteRepository extends BaseRepository
             $qb->setMaxResults($options['limit']);
         }
 
-        $params = array('type' => $type);
-        $stmt = $this->db->executeQuery($qb->getSQL(), $params);
+        $qb->setParameter('type', $type);
+
+        /** @var $stmt \Doctrine\DBAL\Statement */
+        $stmt = $qb->execute();
 
         $favorites = array();
         if ($stmt->rowCount()) {
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->getEntityClass());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->getEntityClass());
             /** @var $favorite Favorite */
             while ($favorite = $stmt->fetch()) {
                 $favorites[$favorite->getUrl()] = $favorite;

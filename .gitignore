@@ -1,5 +1,6 @@
+.idea
 vendor
 composer.phar
-container.php
-container.php.meta
+cache/container.php
+cache/container.php.meta
 config/config.php

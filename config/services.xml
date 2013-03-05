@@ -9,24 +9,12 @@
             <argument>%db_password%</argument>
             <argument type="collection">
                 <!-- PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION -->
-                <argument index="3">2</argument>
+                <argument key="3">2</argument>
                 <!-- PDO::MYSQL_ATTR_INIT_COMMAND -->
-                <argument index="1002">SET NAMES utf8</argument>
+                <argument key="1002">SET NAMES utf8</argument>
             </argument>
         </service>
         <service id="repository_manager" class="MWP\Repository\RepositoryManager">
-            <call method="addRepository">
-                <argument>User</argument>
-                <argument type="service" id="user_repository"/>
-            </call>
-            <call method="addRepository">
-                <argument>Site</argument>
-                <argument type="service" id="site_repository"/>
-            </call>
-            <call method="addRepository">
-                <argument>Group</argument>
-                <argument type="service" id="group_repository"/>
-            </call>
         </service>
         <service id="query_builder" class="Doctrine\DBAL\Query\QueryBuilder">
             <argument type="service" id="connection"/>
@@ -41,23 +29,25 @@
         </service>
         <service id="user_repository" class="MWP\Repository\UserRepository">
             <argument type="service" id="connection"/>
-            <tag name="mwp.repository"/>
+            <tag name="mwp.repository" alias="User"/>
         </service>
         <service id="site_repository" class="MWP\Repository\SiteRepository">
             <argument type="service" id="connection"/>
-            <tag name="mwp.repository"/>
+            <tag name="mwp.repository" alias="Site"/>
         </service>
         <service id="favorite_repository" class="MWP\Repository\FavoriteRepository">
             <argument type="service" id="connection"/>
-            <tag name="mwp.repository"/>
+            <tag name="mwp.repository" alias="Favorite"/>
         </service>
 
         <service id="group_repository" class="MWP\Repository\GroupRepository">
             <argument type="service" id="connection"/>
-            <tag name="mwp.repository"/>
+            <tag name="mwp.repository" alias="Group"/>
         </service>
         <service id="api" class="MWP\API">
             <argument type="service" id="repository_manager"/>
+        </service>
+        <service id="controller.api" class="MWP\Controller\APIController">
         </service>
     </services>
 </container>

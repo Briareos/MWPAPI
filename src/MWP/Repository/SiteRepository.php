@@ -2,15 +2,13 @@
 
 namespace MWP\Repository;
 
+use PDO;
 use MWP\Entity\Group;
 use MWP\Entity\User;
 use MWP\Entity\Site;
 
 class SiteRepository extends BaseRepository
 {
-    /**
-     * @return string
-     */
     public function getEntityClass()
     {
         return 'MWP\Entity\Site';
@@ -72,7 +70,8 @@ class SiteRepository extends BaseRepository
 
         $qb = $this->createQueryBuilder();
         $qb->from($this->getPrefix() . 'mwp_sites', 's');
-        $qb->innerJoin('s', $this->getPrefix() . 'mwp_user_sites', 'us', 'us.user_id = :user_id');
+        $qb->innerJoin('s', $this->getPrefix() . 'mwp_user_sites', 'us', 'us.site_id = s.ID');
+        $qb->where('us.user_id = :user_id');
         $qb->setParameter('user_id', $user->getID());
 
         $qb->select($this->getSelectFields());
@@ -84,11 +83,12 @@ class SiteRepository extends BaseRepository
             $qb->setMaxResults($options['limit']);
         }
 
+        /** @var $stmt \Doctrine\DBAL\Statement */
         $stmt = $qb->execute();
 
         $sites = array();
         if ($stmt->rowCount()) {
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->getEntityClass());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->getEntityClass());
             /** @var $site Site */
             while ($site = $stmt->fetch()) {
                 $sites[$site->getId()] = $site;
@@ -114,11 +114,12 @@ class SiteRepository extends BaseRepository
 
         $qb->select($this->getSelectFields());
 
+        /** @var $stmt \Doctrine\DBAL\Statement */
         $stmt = $qb->execute();
 
         $sites = array();
         if ($stmt->rowCount()) {
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->getEntityClass());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->getEntityClass());
             /** @var $site Site */
             while ($site = $stmt->fetch()) {
                 $sites[$site->getId()] = $site;
@@ -126,5 +127,35 @@ class SiteRepository extends BaseRepository
         }
 
         return $sites;
+    }
+
+    /**
+     * Returns the ungrouped sites IDs, that belong to the user, but don't belong to any group.
+     *
+     * @param \MWP\Entity\User $user
+     * @return array
+     *   An array of site IDs.
+     */
+    public function findUngroupedIdsByUser(User $user)
+    {
+        $qb = $this->createQueryBuilder();
+
+        $qb->from($this->getPrefix() . 'mwp_sites', 's');
+
+        $qb->innerJoin('s', $this->getPrefix() . 'mwp_user_sites', 'us', 'us.site_id = s.ID AND us.user_id = :user_id');
+        $qb->leftJoin('s', $this->getPrefix() . 'mwp_group_sites', 'gs', 'gs.site_id = s.ID');
+        $qb->andWhere('gs.ID IS NULL');
+        $qb->setParameter('user_id', $user->getID());
+        $qb->select('s.ID');
+
+        /** @var $stmt \Doctrine\DBAL\Statement */
+        $stmt = $qb->execute();
+
+        $siteIds = array();
+        if ($stmt->rowCount()) {
+            $stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
+            $siteIds = $stmt->fetchAll();
+        }
+        return $siteIds;
     }
 }

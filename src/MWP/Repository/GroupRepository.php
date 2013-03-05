@@ -2,17 +2,20 @@
 
 namespace MWP\Repository;
 
+use PDO;
 use MWP\Entity\Group;
 use MWP\Entity\User;
 
 class GroupRepository extends BaseRepository
 {
-    /**
-     * @return string
-     */
     public function getEntityClass()
     {
         return 'MWP\Entity\Group';
+    }
+
+    public function getSelectFields()
+    {
+        return array('g.ID', 'g.group_name', 'g.user_id');
     }
 
     /**
@@ -31,15 +34,17 @@ class GroupRepository extends BaseRepository
         $qb->innerJoin('gs', $this->getPrefix() . 'mwp_sites', 's', 's.ID = gs.site_id');
         $qb->groupBy('g.ID');
 
-        $qb->select('g.ID', 'g.group_name', 'g.user_id', 'GROUP_CONCAT(s.ID) AS site_ids');
+        $qb->select($this->getSelectFields());
+        $qb->addSelect('GROUP_CONCAT(s.ID) AS site_ids');
 
-        $params = array('user_id' => $user->getId());
+        $qb->setParameter('user_id', $user->getId());
 
-        $stmt = $this->db->executeQuery($qb->getSQL(), $params);
+        /** @var $stmt \Doctrine\DBAL\Statement */
+        $stmt = $qb->execute();
 
         $groups = array();
         if ($stmt->rowCount()) {
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->getEntityClass());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->getEntityClass());
             /** @var $group Group */
             while ($group = $stmt->fetch()) {
                 $groups[$group->getId()] = $group;

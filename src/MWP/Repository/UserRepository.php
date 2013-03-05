@@ -2,14 +2,11 @@
 
 namespace MWP\Repository;
 
-use Doctrine\ORM\Query;
+use PDO;
 use MWP\Entity\User;
 
 class UserRepository extends BaseRepository
 {
-    /**
-     * @return string
-     */
     public function getEntityClass()
     {
         return 'MWP\Entity\User';
@@ -36,16 +33,16 @@ class UserRepository extends BaseRepository
             'u.display_name'
         );
         $qb->where('u.id = :id');
-        $params = array('id' => $id);
+        $qb->setParameter('id', $id);
 
-        $stmt = $this->db->executeQuery($qb->getSQL(), $params);
+        /** @var $stmt \Doctrine\DBAL\Statement */
+        $stmt = $qb->execute();
 
         $user = null;
         if ($stmt->rowCount()) {
-            $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->getEntityClass());
+            $stmt->setFetchMode(PDO::FETCH_CLASS, $this->getEntityClass());
             $user = $stmt->fetch();
         }
-
         return $user;
     }
 }

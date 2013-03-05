@@ -27,11 +27,17 @@ class Group
 
     public function __construct()
     {
-        if($this->site_ids !== null) {
+        if ($this->site_ids !== null) {
             $this->site_ids = explode(',', $this->site_ids);
-        } else {
-            $this->site_ids = array();
         }
+    }
+
+    /**
+     * @param int $ID
+     */
+    public function setID($ID)
+    {
+        $this->ID = $ID;
     }
 
     /**
@@ -75,11 +81,18 @@ class Group
     }
 
     /**
+     * @param array $site_ids
+     */
+    public function setSiteIds(array $site_ids)
+    {
+        $this->site_ids = $site_ids;
+    }
+
+    /**
      * @return array
      */
     public function getSiteIds()
     {
         return $this->site_ids;
     }
-
 }
